@@ -74,7 +74,7 @@ public abstract class AScorer
 		for (String type : TFTYPES) {
 			// URL
 			if (type.equals("url")) {
-				String[] terms = d.url.split("\\W");
+				String[] terms = d.url.toLowerCase().split("\\W");
 				for (String t : terms) {
 					if (q.queryWords.contains(t)) {
 						if (urlTfs.containsKey(t)) {
@@ -86,7 +86,7 @@ public abstract class AScorer
 				}
 			// Title
 			} else if (type.equals("title")) {
-				String[] terms = d.url.split("\\s+");
+				String[] terms = d.title.toLowerCase().split("\\s+");
 				for (String t : terms) {
 					if (q.queryWords.contains(t)) {
 						if (titleTfs.containsKey(t)) {
@@ -99,6 +99,7 @@ public abstract class AScorer
 			// Body
 			} else if (type.equals("body")) {
 				for (String t : d.body_hits.keySet()) {
+					t = t.toLowerCase();
 					if (q.queryWords.contains(t)) {
 						bodyTfs.put(t, (double) d.body_hits.get(t).size());
 					}
@@ -106,7 +107,7 @@ public abstract class AScorer
 			// Header
 			} else if (type.equals("header")) {
 				for (String header : d.headers) {
-					String[] terms = header.split("\\s+");
+					String[] terms = header.toLowerCase().split("\\s+");
 					for (String t : terms) {
 						if (q.queryWords.contains(t)) {
 							if (headerTfs.containsKey(t)) {
@@ -120,7 +121,7 @@ public abstract class AScorer
 			// Anchor
 			} else if (type.equals("anchor")) {
 				for (String anchor : d.anchors.keySet()) {
-					String[] terms = anchor.split("\\s+");
+					String[] terms = anchor.toLowerCase().split("\\s+");
 					for (String t : terms) {
 						if (q.queryWords.contains(t)) {
 							if (anchorTfs.containsKey(t)) {
