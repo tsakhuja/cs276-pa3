@@ -24,6 +24,18 @@ public abstract class AScorer
 	public Map<String,Double> getQueryFreqs(Query q)
 	{
 		Map<String,Double> tfQuery = new HashMap<String,Double>();
+		for (String s : q.queryWords) {
+			if (tfQuery.containsKey(s)) {
+				tfQuery.put(s, tfQuery.get(s) + 1.0);
+			} else {
+				tfQuery.put(s, 1.0);
+			}
+		}
+		
+		// Apply sublinear scaling
+		for (String s : tfQuery.keySet()) {
+			tfQuery.put(s, 1.0 + Math.log(tfQuery.get(s)));
+		}
 		
 		/*
 		 * @//TODO : Your code here
@@ -52,25 +64,96 @@ public abstract class AScorer
 	{
 		//map from tf type -> queryWord -> score
 		Map<String,Map<String, Double>> tfs = new HashMap<String,Map<String, Double>>();
-		
+
 		////////////////////Initialization/////////////////////
-		
-		/*
-		 * @//TODO : Your code here
-		 */
+		Map<String, Double> urlTfs = new HashMap<String, Double>();
+		Map<String, Double> titleTfs = new HashMap<String, Double>();
+		Map<String, Double> headerTfs = new HashMap<String, Double>();
+		Map<String, Double> bodyTfs = new HashMap<String, Double>();
+		Map<String, Double> anchorTfs = new HashMap<String, Double>();
+		for (String type : TFTYPES) {
+			// URL
+			if (type.equals("url")) {
+				String[] terms = d.url.split("\\W");
+				for (String t : terms) {
+					if (q.queryWords.contains(t)) {
+						if (urlTfs.containsKey(t)) {
+							urlTfs.put(t, urlTfs.get(t) + 1);
+						} else {
+							urlTfs.put(t, 1.0);
+						}
+					}
+				}
+			// Title
+			} else if (type.equals("title")) {
+				String[] terms = d.url.split("\\s+");
+				for (String t : terms) {
+					if (q.queryWords.contains(t)) {
+						if (titleTfs.containsKey(t)) {
+							titleTfs.put(t, titleTfs.get(t) + 1.0);
+						} else {
+							titleTfs.put(t, 1.0);
+						}
+					}
+				}
+			// Body
+			} else if (type.equals("body")) {
+				for (String t : d.body_hits.keySet()) {
+					if (q.queryWords.contains(t)) {
+						bodyTfs.put(t, (double) d.body_hits.get(t).size());
+					}
+				}
+			// Header
+			} else if (type.equals("header")) {
+				for (String header : d.headers) {
+					String[] terms = header.split("\\s+");
+					for (String t : terms) {
+						if (q.queryWords.contains(t)) {
+							if (headerTfs.containsKey(t)) {
+								headerTfs.put(t, headerTfs.get(t) + 1);
+							} else {
+								headerTfs.put(t, 1.0);
+							}
+						}
+					}
+				}
+			// Anchor
+			} else if (type.equals("anchor")) {
+				for (String anchor : d.anchors.keySet()) {
+					String[] terms = anchor.split("\\s+");
+					for (String t : terms) {
+						if (q.queryWords.contains(t)) {
+							if (anchorTfs.containsKey(t)) {
+								anchorTfs.put(t, anchorTfs.get(t) + d.anchors.get(t));
+							} else {
+								headerTfs.put(t, (double) d.anchors.get(t));
+							}
+						}
+					}
+				}
+			}
+		}
+				
+	
+
 		
 	    ////////////////////////////////////////////////////////
 		
 		//////////handle counts//////
 		
-		//loop through query terms increasing relevant tfs
-		for (String queryWord : q.queryWords)
-		{
-			/*
-			 * @//TODO : Your code here
-			 */
-			
+		tfs.put("url", urlTfs);
+		tfs.put("header", headerTfs);
+		tfs.put("body", bodyTfs);
+		tfs.put("anchor", anchorTfs);
+		tfs.put("title", titleTfs);
+		
+		// Add sublinear scaling
+		for (String type : TFTYPES) {
+			for (String s : tfs.get(type).keySet()) {
+				tfs.get(type).put(s, 1 + Math.log(tfs.get(type).get(s)));
+			}
 		}
+		
 		return tfs;
 	}
 	

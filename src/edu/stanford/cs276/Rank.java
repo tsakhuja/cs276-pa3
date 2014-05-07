@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Comparator;
 
-import util.Pair;
+import edu.stanford.cs276.util.Pair;
 
 public class Rank 
 {
