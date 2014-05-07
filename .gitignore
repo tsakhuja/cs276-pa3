@@ -1,0 +1,9 @@
+.DS_STORE
+data/*
+bin/**
+rank.sh
+queryDocTrain*
+submit.py
+.classpath
+.project
+.settings*
