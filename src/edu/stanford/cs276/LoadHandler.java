@@ -3,6 +3,7 @@ package edu.stanford.cs276;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -112,44 +113,63 @@ public class LoadHandler
 	      }
 	      catch(IOException | ClassNotFoundException ioe)
 	      {
-	         ioe.printStackTrace();
 	         return null;
 	      }
 		return termDocCount;
 	}
 	
 	//builds and then serializes from file
-	public static Map<String,Double> buildDFs(String dataDir, String idfFile)
+	public static Map<String,Double> buildDFs(String dataDir, String idfFile) throws IOException
 	{
 		
-		/* Get root directory */
+		Map<String,Double> idfs = new HashMap<String, Double>();
+		int docCount = 0;
+		
 		String root = dataDir;
 		File rootdir = new File(root);
 		if (!rootdir.exists() || !rootdir.isDirectory()) {
 			System.err.println("Invalid data directory: " + root);
 			return null;
 		}
-		
 		File[] dirlist = rootdir.listFiles();
-
-		int totalDocCount = 0;
-		
-		//counts number of documents in which each term appears
-		Map<String,Double> termDocCount = new HashMap<String,Double>();
-		
-		/*
-		 * @//TODO : Your code here --consult pa1 (will be basically a simplified version)
-		 */
-		
-		System.out.println(totalDocCount);
-		
-		//make idf
-		for (String term : termDocCount.keySet())
-		{
-			/*
-			 * @//TODO : Your code here
-			 */
+		Arrays.sort(dirlist);
+		/* For each block */
+		for (File block : dirlist) {
+			File blockDir = new File(root, block.getName());
+			File[] filelist = blockDir.listFiles();
+			Arrays.sort(filelist);
+			for (File file : filelist) {
+				docCount++;
+				BufferedReader reader = new BufferedReader(new FileReader(file));
+				String line;
+				Set<String> terms = new HashSet<String>();
+				while ((line = reader.readLine()) != null) {
+					String[] tokens = line.trim().split("\\s+");
+					for (String token : tokens) {
+						terms.add(token);
+					}
+				}
+				reader.close();
+				
+				for (String term : terms) {
+					if (idfs.containsKey(term)) {
+						idfs.put(term, idfs.get(term) + 1);
+					} else {
+						idfs.put(term, 1.0);
+					}
+				}
+			}
 		}
+		
+		// Convert dfs to smoothed idfs
+		for (String term : idfs.keySet()) {
+			double idf = Math.log((docCount + 1.0) / (idfs.get(term) + 1.0));
+			idfs.put(term, idf);
+		}
+		
+		// Put placeholder term for terms not in any document
+		idfs.put("_NONE_", Math.log(docCount + 1));
+		
 		
 		
 		//saves to file
@@ -157,7 +177,7 @@ public class LoadHandler
         {
 			FileOutputStream fos = new FileOutputStream(idfFile);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(termDocCount);
+			oos.writeObject(idfs);
 			oos.close();
 			fos.close();
         }
@@ -167,7 +187,7 @@ public class LoadHandler
         	ioe.printStackTrace();
         }
 		
-        return termDocCount;
+        return idfs;
 	}
 
 }

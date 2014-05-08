@@ -2,11 +2,15 @@ package edu.stanford.cs276;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import edu.stanford.cs276.util.Pair;
 
@@ -122,12 +126,12 @@ public class Rank
 
 	public static void main(String[] args) throws IOException 
 	{
-
-		Map<String,Double> idfs = null;
+		// Term -> laplace-smoothed idf
+		Map<String,Double> idfs = LoadHandler.loadDFs("idfs");
+		if (idfs == null) {
+			idfs = LoadHandler.buildDFs("data", "idfs");
+		}
 		
-		/*
-		 * @//TODO : Your code here to handle idfs
-		 */
 		
 		
 		if (args.length < 2) {

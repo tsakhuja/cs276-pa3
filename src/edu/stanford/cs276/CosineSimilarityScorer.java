@@ -25,9 +25,9 @@ public class CosineSimilarityScorer extends AScorer
 	///////////////weights///////////////////////////
     double urlweight = 1;
     double titleweight  = 4;
-    double bodyweight = 3;
-    double headerweight = 3;
-    double anchorweight = 3;
+    double bodyweight = 4;
+    double headerweight = 10;
+    double anchorweight = 10;
     
     double smoothingBodyLength = 500;
     //////////////////////////////////////////
@@ -70,6 +70,7 @@ public class CosineSimilarityScorer extends AScorer
 	
 	public void normalizeTFs(Map<String,Map<String, Double>> tfs,Document d, Query q)
 	{
+		// Normalize Document Vector
 		for (Map<String, Double> tfMap : tfs.values()) {
 			for (String t : tfMap.keySet()) {
 				tfMap.put(t, tfMap.get(t) / (d.body_length + smoothingBodyLength));
@@ -88,6 +89,12 @@ public class CosineSimilarityScorer extends AScorer
 		
 		Map<String,Double> tfQuery = getQueryFreqs(q);
 		
+		// Apply idf weighting to query frequencies
+		for (String term : tfQuery.keySet()) {
+			double idf = idfs.containsKey(term) ? idfs.get(term) : idfs.get("_NONE_");
+			double score = tfQuery.get(term) * idf;
+			tfQuery.put(term, score);
+		}
 		
         return getNetScore(tfs,q,tfQuery,d);
 	}
