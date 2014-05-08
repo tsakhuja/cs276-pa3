@@ -23,32 +23,58 @@ public class CosineSimilarityScorer extends AScorer
 	}
 	
 	///////////////weights///////////////////////////
-    double urlweight = -1;
-    double titleweight  = -1;
-    double bodyweight = -1;
-    double headerweight = -1;
-    double anchorweight = -1;
+    double urlweight = 1;
+    double titleweight  = 4;
+    double bodyweight = 3;
+    double headerweight = 3;
+    double anchorweight = 3;
     
-    double smoothingBodyLength = -1;
+    double smoothingBodyLength = 500;
     //////////////////////////////////////////
 	
 	public double getNetScore(Map<String,Map<String, Double>> tfs, Query q, Map<String,Double> tfQuery,Document d)
 	{
 		double score = 0.0;
+		// Compute weighted document vector
+		double[] weightedNetTfs = new double[q.queryWords.size()];
+		for (String type : tfs.keySet()) {
+			Map<String, Double> tfMap = tfs.get(type);
+			for (int i = 0; i < q.queryWords.size(); i++) {
+				String s = q.queryWords.get(i);
+				
+				if (tfMap.containsKey(s)) {
+					if (type.equals("url")) {
+						weightedNetTfs[i] += urlweight * tfMap.get(s);
+					} else if (type.equals("title")) {
+						weightedNetTfs[i] += titleweight * tfMap.get(s);
+					} else if (type.equals("body")) {
+						weightedNetTfs[i] += bodyweight * tfMap.get(s);
+					} else if (type.equals("header")) {
+						weightedNetTfs[i] += headerweight * tfMap.get(s);
+					} else if (type.equals("anchor")) {
+						weightedNetTfs[i] += anchorweight * tfMap.get(s);
+					}
+				}
+			}
+		}
 		
-		/*
-		 * @//TODO : Your code here
-		 */
-		
+		// Compute dot product
+		for (int i = 0; i < q.queryWords.size(); i++) {
+			score += tfQuery.get(q.queryWords.get(i)) * weightedNetTfs[i];
+		}
+
+//		System.out.println("Score: "+ score);
 		return score;
 	}
 
 	
 	public void normalizeTFs(Map<String,Map<String, Double>> tfs,Document d, Query q)
 	{
-		/*
-		 * @//TODO : Your code here
-		 */
+		for (Map<String, Double> tfMap : tfs.values()) {
+			for (String t : tfMap.keySet()) {
+				tfMap.put(t, tfMap.get(t) / (d.body_length + smoothingBodyLength));
+			}
+		}
 	}
 
 	

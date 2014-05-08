@@ -47,11 +47,9 @@ public class Rank
 			Collections.sort(urlAndScores, new Comparator<Pair<String,Double>>() {
 				@Override
 				public int compare(Pair<String, Double> o1, Pair<String, Double> o2) 
-				{
-					/*
-					 * @//TODO : Your code here
-					 */
-					return -1;
+				{	
+					if (o1.getSecond() == o2.getSecond()) return 0;
+					return o1.getSecond() > o2.getSecond() ? -1 : 1;
 				}	
 			});
 			

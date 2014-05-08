@@ -73,7 +73,7 @@ public abstract class AScorer
 		Map<String, Double> anchorTfs = new HashMap<String, Double>();
 		for (String type : TFTYPES) {
 			// URL
-			if (type.equals("url")) {
+			if (type.equals("url") && d.url != null) {
 				String[] terms = d.url.toLowerCase().split("\\W");
 				for (String t : terms) {
 					if (q.queryWords.contains(t)) {
@@ -85,7 +85,7 @@ public abstract class AScorer
 					}
 				}
 			// Title
-			} else if (type.equals("title")) {
+			} else if (type.equals("title") && d.title != null) {
 				String[] terms = d.title.toLowerCase().split("\\s+");
 				for (String t : terms) {
 					if (q.queryWords.contains(t)) {
@@ -97,7 +97,7 @@ public abstract class AScorer
 					}
 				}
 			// Body
-			} else if (type.equals("body")) {
+			} else if (type.equals("body") && d.body_hits != null) {
 				for (String t : d.body_hits.keySet()) {
 					t = t.toLowerCase();
 					if (q.queryWords.contains(t)) {
@@ -105,7 +105,7 @@ public abstract class AScorer
 					}
 				}
 			// Header
-			} else if (type.equals("header")) {
+			} else if (type.equals("header") && d.headers != null) {
 				for (String header : d.headers) {
 					String[] terms = header.toLowerCase().split("\\s+");
 					for (String t : terms) {
@@ -119,15 +119,15 @@ public abstract class AScorer
 					}
 				}
 			// Anchor
-			} else if (type.equals("anchor")) {
+			} else if (type.equals("anchor") && d.anchors != null) {
 				for (String anchor : d.anchors.keySet()) {
 					String[] terms = anchor.toLowerCase().split("\\s+");
 					for (String t : terms) {
 						if (q.queryWords.contains(t)) {
 							if (anchorTfs.containsKey(t)) {
-								anchorTfs.put(t, anchorTfs.get(t) + d.anchors.get(t));
+								anchorTfs.put(t, anchorTfs.get(t) + d.anchors.get(anchor));
 							} else {
-								headerTfs.put(t, (double) d.anchors.get(t));
+								headerTfs.put(t, (double) d.anchors.get(anchor));
 							}
 						}
 					}
