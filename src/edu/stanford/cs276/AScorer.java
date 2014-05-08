@@ -37,9 +37,6 @@ public abstract class AScorer
 			tfQuery.put(s, 1.0 + Math.log(tfQuery.get(s)));
 		}
 		
-		/*
-		 * @//TODO : Your code here
-		 */
 		
 		return tfQuery;
 	}
@@ -127,7 +124,7 @@ public abstract class AScorer
 							if (anchorTfs.containsKey(t)) {
 								anchorTfs.put(t, anchorTfs.get(t) + d.anchors.get(anchor));
 							} else {
-								headerTfs.put(t, (double) d.anchors.get(anchor));
+								anchorTfs.put(t, (double) d.anchors.get(anchor));
 							}
 						}
 					}
