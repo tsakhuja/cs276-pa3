@@ -18,22 +18,22 @@ public class BM25Scorer extends AScorer
 
 	
 	///////////////weights///////////////////////////
-    double urlweight = -1;
-    double titleweight  = -1;
-    double bodyweight = -1;
-    double headerweight = -1;
-    double anchorweight = -1;
+    double urlweight = .1;
+    double titleweight  = .4;
+    double bodyweight = .4;
+    double headerweight = 1;
+    double anchorweight = 1;
     
     ///////bm25 specific weights///////////////
-    double burl=-1;
-    double btitle=-1;
-    double bheader=-1;
-    double bbody=-1;
-    double banchor=-1;
+    double burl=1;
+    double btitle=1;
+    double bheader=1;
+    double bbody=1;
+    double banchor=1;
 
-    double k1=-1;
-    double pageRankLambda=-1;
-    double pageRankLambdaPrime=-1;
+    double k1=1;
+    double pageRankLambda=0.2;
+    double pageRankLambdaPrime=1;
 
     ////////////Page rank function//////////////////////
     int pageRankFunc = 0;//0-Log
@@ -113,18 +113,20 @@ public class BM25Scorer extends AScorer
 		for (String term : q.queryWords){
 			//Weight each field
 			double W = 0.0;
-			for (String field : tfs.get(term).keySet()){
-				//Get field parameter
-				if (field == "url"){
-					W += urlweight*tfs.get(term).get(field);
-				} else if (field == "header"){
-					W += headerweight*tfs.get(term).get(field);
-				} else if (field == "body"){
-					W += bodyweight*tfs.get(term).get(field);
-				} else if (field == "title"){
-					W += titleweight*tfs.get(term).get(field);
-				} else if (field == "anchor"){
-					W += anchorweight*tfs.get(term).get(field);
+			for (String field : this.TFTYPES){
+				if (tfs.get(field).containsKey(term)){
+					//Get field parameter
+					if (field == "url"){
+						W += urlweight*tfs.get(field).get(term);
+					} else if (field == "header"){
+						W += headerweight*tfs.get(field).get(term);
+					} else if (field == "body"){
+						W += bodyweight*tfs.get(field).get(term);
+					} else if (field == "title"){
+						W += titleweight*tfs.get(field).get(term);
+					} else if (field == "anchor"){
+						W += anchorweight*tfs.get(field).get(term);
+					}
 				}
 			}
 			//Score the term
@@ -136,26 +138,28 @@ public class BM25Scorer extends AScorer
 	//do bm25 normalization
 	public void normalizeTFs(Map<String,Map<String, Double>> tfs,Document d, Query q)
 	{
-		//For each term
-		for (String term : q.queryWords){
-			//For each field
-			for (String field : tfs.get(term).keySet()){
-				//Get field parameter
-				double B = 0.0;
-				if (field == "url"){
-					B = burl;
-				} else if (field == "header"){
-					B = bheader;
-				} else if (field == "body"){
-					B = bbody;
-				} else if (field == "title"){
-					B = btitle;
-				} else if (field == "anchor"){
-					B = banchor;
-				}
+		//For each field
+		for (String field : this.TFTYPES){
+			//Get field parameter
+			double B = 0.0;
+			if (field == "url"){
+				B = burl;
+			} else if (field == "header"){
+				B = bheader;
+			} else if (field == "body"){
+				B = bbody;
+			} else if (field == "title"){
+				B = btitle;
+			} else if (field == "anchor"){
+				B = banchor;
+			}
+			//For each term
+			for (String term : q.queryWords){
 				//Normalize
-				double denom = 1 + B*(lengths.get(d).get(field)/avgLengths.get(field)-1);
-				tfs.get(term).put(field,tfs.get(term).get(field)/denom);
+				if (tfs.get(field).containsKey(q)){
+					double denom = 1 + B*(lengths.get(d).get(field)/avgLengths.get(field)-1);
+					tfs.get(field).put(term,tfs.get(field).get(term)/denom);
+				}
 			}
 		}
 	}

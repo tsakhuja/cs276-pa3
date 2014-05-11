@@ -56,14 +56,14 @@ public abstract class AScorer
 	}
 	// Header
 	String[] parseHeaders(Document d){
-		Vector<String> headers = new Vector<String>();
+		List<String> headers = new ArrayList<String>();
 		for (String header : d.headers) {
 			String[] terms = header.toLowerCase().split("\\s+");
 			for (String t : terms) {
 				headers.add(t);
 			}
 		}
-		return (String[]) headers.toArray();
+		return headers.toArray(new String[headers.size()]);
 	}
 	// Anchor
 	Map<String, Double> parseAnchors(Document d){
