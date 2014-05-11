@@ -18,22 +18,22 @@ public class BM25Scorer extends AScorer
 
 	
 	///////////////weights///////////////////////////
-    double urlweight = .1;
-    double titleweight  = .4;
-    double bodyweight = .4;
+    double urlweight = .01;
+    double titleweight  = 10;
+    double bodyweight = .2;
     double headerweight = 1;
     double anchorweight = 1;
     
     ///////bm25 specific weights///////////////
-    double burl=1;
+    double burl=0.5;
     double btitle=1;
     double bheader=1;
-    double bbody=1;
-    double banchor=1;
+    double bbody=10;
+    double banchor=2;
 
     double k1=1;
     double pageRankLambda=0.2;
-    double pageRankLambdaPrime=1;
+    double pageRankLambdaPrime=0;
 
     ////////////Page rank function//////////////////////
     int pageRankFunc = 0;//0-Log
