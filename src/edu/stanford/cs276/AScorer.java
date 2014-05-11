@@ -55,10 +55,13 @@ public abstract class AScorer
 		return d.title.toLowerCase().split("\\s+");
 	}
 	// Header
+	String[] parseHeader(String header){
+		return header.toLowerCase().split("\\s+");
+	}
 	String[] parseHeaders(Document d){
 		List<String> headers = new ArrayList<String>();
 		for (String header : d.headers) {
-			String[] terms = header.toLowerCase().split("\\s+");
+			String[] terms = parseHeader(header);
 			for (String t : terms) {
 				headers.add(t);
 			}
@@ -66,10 +69,13 @@ public abstract class AScorer
 		return headers.toArray(new String[headers.size()]);
 	}
 	// Anchor
+	String[] parseAnchor(String anchor){
+		return anchor.toLowerCase().split("\\s+");
+	}
 	Map<String, Double> parseAnchors(Document d){
 		Map<String, Double> anchors = new HashMap<String, Double>();
 		for (String anchor : d.anchors.keySet()) {
-			String[] terms = anchor.toLowerCase().split("\\s+");
+			String[] terms = parseAnchor(anchor);
 			for (String t : terms) {
 				if (anchors.containsKey(t)) {
 					anchors.put(t, anchors.get(t) + d.anchors.get(anchor));

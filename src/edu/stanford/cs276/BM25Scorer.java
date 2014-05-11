@@ -61,15 +61,15 @@ public class BM25Scorer extends AScorer
     			Document d = queryDict.get(q).get(url);
     			for (String tfType : this.TFTYPES){
     				double l = 0;
-    				if (tfType == "url"){
+    				if (tfType.equals("url")){
     					l = (double) parseUrl(d).length;
-    				} else if (tfType == "title"){
+    				} else if (tfType.equals("title")){
     					l = (double) parseTitle(d).length;
-    				} else if (tfType == "body"){
+    				} else if (tfType.equals("body")){
     					l = (double) d.body_length;
-    				} else if (tfType == "body"){
+    				} else if (tfType.equals("body")){
     					l = (double) parseHeaders(d).length;
-    				} else if (tfType == "anchors"){
+    				} else if (tfType.equals("anchors")){
         				//anchor
     					Map<String, Double> anchors = parseAnchors(d);
     					for (Double a : anchors.values()){
@@ -116,15 +116,15 @@ public class BM25Scorer extends AScorer
 			for (String field : this.TFTYPES){
 				if (tfs.get(field).containsKey(term)){
 					//Get field parameter
-					if (field == "url"){
+					if (field.equals("url")){
 						W += urlweight*tfs.get(field).get(term);
-					} else if (field == "header"){
+					} else if (field.equals("header")){
 						W += headerweight*tfs.get(field).get(term);
-					} else if (field == "body"){
+					} else if (field.equals("body")){
 						W += bodyweight*tfs.get(field).get(term);
-					} else if (field == "title"){
+					} else if (field.equals("title")){
 						W += titleweight*tfs.get(field).get(term);
-					} else if (field == "anchor"){
+					} else if (field.equals("anchor")){
 						W += anchorweight*tfs.get(field).get(term);
 					}
 				}
@@ -142,15 +142,15 @@ public class BM25Scorer extends AScorer
 		for (String field : this.TFTYPES){
 			//Get field parameter
 			double B = 0.0;
-			if (field == "url"){
+			if (field.equals("url")){
 				B = burl;
-			} else if (field == "header"){
+			} else if (field.equals("header")){
 				B = bheader;
-			} else if (field == "body"){
+			} else if (field.equals("body")){
 				B = bbody;
-			} else if (field == "title"){
+			} else if (field.equals("title")){
 				B = btitle;
-			} else if (field == "anchor"){
+			} else if (field.equals("anchor")){
 				B = banchor;
 			}
 			//For each term

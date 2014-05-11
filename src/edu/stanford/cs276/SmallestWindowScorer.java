@@ -1,9 +1,6 @@
 package edu.stanford.cs276;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -11,7 +8,7 @@ public class SmallestWindowScorer extends BM25Scorer
 {
 
 	/////smallest window specific hyperparameters////////
-    double B = 10;    
+    double B = 0.1;    
    //double boostmod = -1;
     
     //////////////////////////////
@@ -40,17 +37,17 @@ public class SmallestWindowScorer extends BM25Scorer
 		} 
 	};
 
-	public double checkWindow(Query q,String docstr,double curSmallestWindow)
+	public double checkWindow(Query q,String[] terms,double curSmallestWindow)
 	{
-		if (docstr == null) return curSmallestWindow;
+		if (terms.length == 0) return curSmallestWindow;
 		TreeSet<TreeSet<Integer>> idxList = new TreeSet<TreeSet<Integer>>(ListComporator);
 		//Build index list queues
 		for (String term : q.queryWords){
 			TreeSet<Integer> docList = new TreeSet<Integer>();
-			int idx = docstr.indexOf(term,0);
-			while (idx != -1){
-				docList.add(idx);
-				idx = docstr.indexOf(term,idx+1);
+			for (int i=0; i<terms.length; i++){
+				if (terms[i].equals(term)){
+					docList.add(i);
+				}
 			}
 			//Term not found
 			if (docList.isEmpty()) return curSmallestWindow;
@@ -83,13 +80,13 @@ public class SmallestWindowScorer extends BM25Scorer
 	public double getBoost(Document d, Query q){
 		double curSmallestWindow = Integer.MAX_VALUE;
 		//url
-		curSmallestWindow = checkWindow(q, d.url, curSmallestWindow);
+		curSmallestWindow = checkWindow(q, parseUrl(d), curSmallestWindow);
 		//title
-		curSmallestWindow = checkWindow(q, d.title, curSmallestWindow);
+		curSmallestWindow = checkWindow(q, parseTitle(d), curSmallestWindow);
 		//header
 		if (d.headers != null){
 			for (String header : d.headers){
-				curSmallestWindow = checkWindow(q, header, curSmallestWindow);
+				curSmallestWindow = checkWindow(q, parseHeader(header), curSmallestWindow);
 			}
 		}
 		//body
@@ -99,7 +96,7 @@ public class SmallestWindowScorer extends BM25Scorer
 		//anchor
 		if (d.anchors != null){
 			for (String anchor : d.anchors.keySet()){
-				curSmallestWindow = checkWindow(q, anchor, curSmallestWindow);
+				curSmallestWindow = checkWindow(q, parseAnchor(anchor), curSmallestWindow);
 			}
 		}
 		if (curSmallestWindow == Integer.MAX_VALUE) return 1;
@@ -113,7 +110,7 @@ public class SmallestWindowScorer extends BM25Scorer
 		this.normalizeTFs(tfs, d, q);
 		
 		Map<String,Double> tfQuery = getQueryFreqs(q);
-        return getNetScore(tfs,q,tfQuery,d) * getBoost(d, q);
+		return getNetScore(tfs,q,tfQuery,d) * getBoost(d, q);
 	}
 
 }
