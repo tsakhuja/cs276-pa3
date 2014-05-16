@@ -24,12 +24,12 @@ public class CosineSimilarityScorer extends AScorer
 	
 	///////////////weights///////////////////////////
     double urlweight = 1;
-    double titleweight  = 4;
+    double titleweight  = 20;
     double bodyweight = 4;
     double headerweight = 10;
-    double anchorweight = 10;
+    double anchorweight = 20;
     
-    double smoothingBodyLength = 500;
+    double smoothingBodyLength = 600;
     //////////////////////////////////////////
 	
 	public double getNetScore(Map<String,Map<String, Double>> tfs, Query q, Map<String,Double> tfQuery,Document d)
