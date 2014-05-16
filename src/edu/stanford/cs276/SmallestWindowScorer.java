@@ -8,8 +8,8 @@ public class SmallestWindowScorer extends BM25Scorer
 {
 
 	/////smallest window specific hyperparameters////////
-    double B = 0.1;    
-   //double boostmod = -1;
+    double B = .1;    
+   double boostmod = 4;
     
     //////////////////////////////
 	
@@ -100,7 +100,7 @@ public class SmallestWindowScorer extends BM25Scorer
 			}
 		}
 		if (curSmallestWindow == Integer.MAX_VALUE) return 1;
-		return 1+B*Math.pow(2,q.queryWords.size()-curSmallestWindow);
+		return 1+B*Math.pow(boostmod,q.queryWords.size()-curSmallestWindow);
 	}
 
 	@Override

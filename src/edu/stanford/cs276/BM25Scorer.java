@@ -18,25 +18,27 @@ public class BM25Scorer extends AScorer
 
 	
 	///////////////weights///////////////////////////
-    double urlweight = .01;
-    double titleweight  = 10;
-    double bodyweight = .2;
-    double headerweight = 1;
-    double anchorweight = 1;
+    double urlweight = 1;
+    double titleweight  = 20;
+    double bodyweight = 4;
+    double headerweight = 10;
+    double anchorweight = 20;
     
     ///////bm25 specific weights///////////////
-    double burl=0.5;
-    double btitle=1;
-    double bheader=1;
+    double burl=1;
+    double btitle=10;
+    double bheader=10;
     double bbody=10;
-    double banchor=2;
+    double banchor=10;
 
-    double k1=1;
-    double pageRankLambda=0.2;
-    double pageRankLambdaPrime=0;
+    double k1=50;
+    double pageRankLambda=0.5;
+    double pageRankLambdaPrime=20;
+    
+    //879
 
     ////////////Page rank function//////////////////////
-    int pageRankFunc = 0;//0-Log
+    int pageRankFunc = 0;//0-Log 1-Inverse 2-inverse exponential
     
     
     ////////////bm25 data structures--feel free to modify ////////
@@ -100,12 +102,16 @@ public class BM25Scorer extends AScorer
     ////////////////////////////////////
     double getPageRankScore(int pageRank){
     	switch(pageRankFunc){
-    		default:
-    			return Math.log(pageRankLambdaPrime + pageRank);
+    	case 1:
+    		return pageRankLambdaPrime / (pageRankLambdaPrime + pageRank);
+    	case 2:
+    		return 1 / (pageRankLambdaPrime + Math.exp(pageRank));
+    	default:
+    		return Math.log(pageRankLambdaPrime + pageRank);
     	}
     }
-    
-    
+
+
 	public double getNetScore(Map<String,Map<String, Double>> tfs, Query q, Map<String,Double> tfQuery,Document d)
 	{
 		double score = 0.0;
